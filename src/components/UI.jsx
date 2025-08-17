@@ -113,7 +113,12 @@ export function UI() {
                         flexGrow={1}
                         onClick={async () => {
                           try {
-                            await exportDrumToAR('drum', 0.3);
+                            // For iPhone, directly open the AR page with USDZ
+                            if (isIOS()) {
+                              window.open('/ar/drum-ar.html', '_blank');
+                            } else {
+                              await exportDrumToAR('drum', 0.3);
+                            }
                           } catch (error) {
                             console.error("AR Quick Look Error:", error);
                             alert("Failed to launch AR mode.\nMake sure you're using Safari on iOS 12+ or Chrome with AR support.");
