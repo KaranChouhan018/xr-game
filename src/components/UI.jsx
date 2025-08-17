@@ -1,6 +1,7 @@
 import { Container, Image, Root, Text } from "@react-three/uikit";
 import { Button, Card, Defaults } from "@react-three/uikit-apfel";
 import { useXR } from "@react-three/xr";
+import { useEffect, useState } from "react";
 import { store } from "../App";
 import { useSong } from "../hooks/useSong";
 
@@ -12,6 +13,13 @@ export function UI() {
   const songData = useSong((state) => state.songData);
   const passthrough = useSong((state) => state.passthrough);
   const setPassthrough = useSong((state) => state.setPassthrough);
+  const [isXRSupported, setIsXRSupported] = useState(false);
+
+  useEffect(() => {
+    if (navigator.xr) {
+      navigator.xr.isSessionSupported('immersive-ar').then(setIsXRSupported);
+    }
+  }, []);
   if (songData) {
     return null;
   }
@@ -96,9 +104,20 @@ export function UI() {
                     size="sm"
                     platter
                     flexGrow={1}
-                    onClick={() => store.enterAR()}
+                    onClick={async () => {
+                      if (!isXRSupported) {
+                        alert("WebXR not supported on this device.\n\nRequirements:\n• HTTPS connection (or localhost)\n• Chrome/Edge browser with WebXR enabled\n• VR/AR capable device or headset\n• Enable WebXR flags in chrome://flags");
+                        return;
+                      }
+                      try {
+                        await store.enterAR();
+                      } catch (error) {
+                        console.error("XR Error:", error);
+                        alert(`Failed to start AR session: ${error.message}\n\nTroubleshooting:\n• Ensure AR device is connected\n• Check browser permissions\n• Try refreshing the page`);
+                      }
+                    }}
                   >
-                    <Text>VR/AR</Text>
+                    <Text>{isXRSupported ? "VR/AR" : "VR/AR (Not Supported)"}</Text>
                   </Button>
                 ) : (
                   <>
