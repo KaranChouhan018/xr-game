@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Quick Look - Drum Kit</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f7;
+            text-align: center;
+        }
+        .ar-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .ar-link {
+            display: inline-block;
+            background: #007AFF;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin: 10px;
+            font-weight: 500;
+        }
+        .ar-preview {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+        }
+        .instructions {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="ar-container">
+        <h2>🥁 Drum Kit AR Experience</h2>
+        
+        <div class="ar-preview">
+            Drum Kit 3D Model Preview
+        </div>
+        
+        <!-- AR Quick Look Links -->
+        <a href="../models/Drum.glb" 
+           rel="ar" 
+           class="ar-link">
+            View Drum in AR
+        </a>
+        
+        <a href="../models/Cymbal.glb" 
+           rel="ar" 
+           class="ar-link">
+            View Cymbal in AR
+        </a>
+        
+        <a href="../models/Drum stick.glb" 
+           rel="ar" 
+           class="ar-link">
+            View Drumstick in AR
+        </a>
+        
+        <div class="instructions">
+            <strong>Instructions:</strong><br>
+            • Tap any AR button to view the 3D model<br>
+            • iOS 12+ and Safari required<br>
+            • Point your camera at a flat surface<br>
+            • Tap to place the object in your space<br>
+            • Pinch to resize, drag to move
+        </div>
+    </div>
+
+    <script>
+        // Check if AR Quick Look is supported
+        if (!('rel' in document.createElement('a') && 
+              /iPad|iPhone|iPod/.test(navigator.userAgent))) {
+            document.querySelector('.ar-container').innerHTML = 
+                '<h3>AR Quick Look</h3><p>This feature requires Safari on iOS 12 or later.</p>';
+        }
+        
+        // Handle AR Quick Look events
+        document.querySelectorAll('a[rel="ar"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // Add analytics or custom handling here
+                console.log('AR Quick Look triggered for:', link.href);
+            });
+        });
+    </script>
+</body>
+</html>

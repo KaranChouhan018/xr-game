@@ -4,6 +4,9 @@ import { useXR } from "@react-three/xr";
 import { useEffect, useState } from "react";
 import { store } from "../App";
 import { useSong } from "../hooks/useSong";
+import { isIOS, isMobile, supportsARQuickLook } from "../utils/deviceDetection";
+import { exportDrumToAR, DRUM_MODELS } from "../utils/usdzExport";
+import { MobileVRSimulator } from "../utils/mobileVR";
 
 export function UI() {
   const loadSong = useSong((state) => state.loadSong);
@@ -14,6 +17,7 @@ export function UI() {
   const passthrough = useSong((state) => state.passthrough);
   const setPassthrough = useSong((state) => state.setPassthrough);
   const [isXRSupported, setIsXRSupported] = useState(false);
+  const [mobileVR, setMobileVR] = useState(null);
 
   useEffect(() => {
     if (navigator.xr) {
@@ -99,26 +103,73 @@ export function UI() {
                 gap={8}
               >
                 {mode === null ? (
-                  <Button
-                    variant="rect"
-                    size="sm"
-                    platter
-                    flexGrow={1}
-                    onClick={async () => {
-                      if (!isXRSupported) {
-                        alert("WebXR not supported on this device.\n\nRequirements:\n• HTTPS connection (or localhost)\n• Chrome/Edge browser with WebXR enabled\n• VR/AR capable device or headset\n• Enable WebXR flags in chrome://flags");
-                        return;
-                      }
-                      try {
-                        await store.enterAR();
-                      } catch (error) {
-                        console.error("XR Error:", error);
-                        alert(`Failed to start AR session: ${error.message}\n\nTroubleshooting:\n• Ensure AR device is connected\n• Check browser permissions\n• Try refreshing the page`);
-                      }
-                    }}
-                  >
-                    <Text>{isXRSupported ? "VR/AR" : "VR/AR (Not Supported)"}</Text>
-                  </Button>
+                  <>
+                    {/* iPhone AR Quick Look */}
+                    {isIOS() && (
+                      <Button
+                        variant="rect"
+                        size="sm"
+                        platter
+                        flexGrow={1}
+                        onClick={async () => {
+                          try {
+                            await exportDrumToAR('drum', 0.3);
+                          } catch (error) {
+                            console.error("AR Quick Look Error:", error);
+                            alert("Failed to launch AR mode.\nMake sure you're using Safari on iOS 12+ or Chrome with AR support.");
+                          }
+                        }}
+                      >
+                        <Text>iPhone AR</Text>
+                      </Button>
+                    )}
+                    
+                    {/* Mobile VR Simulation */}
+                    {isMobile() && MobileVRSimulator.isSupported() && (
+                      <Button
+                        variant="rect"
+                        size="sm"
+                        platter
+                        flexGrow={1}
+                        onClick={async () => {
+                          try {
+                            if (!mobileVR) {
+                              // Initialize mobile VR (requires camera and renderer from parent)
+                              alert("Mobile VR mode requires device orientation permissions.\nTilt your device to look around!");
+                              // Note: Would need camera/renderer from React Three Fiber context
+                            }
+                          } catch (error) {
+                            console.error("Mobile VR Error:", error);
+                            alert("Mobile VR not supported.\nRequires gyroscope and device orientation permissions.");
+                          }
+                        }}
+                      >
+                        <Text>Mobile VR</Text>
+                      </Button>
+                    )}
+
+                    {/* Standard WebXR */}
+                    <Button
+                      variant="rect"
+                      size="sm"
+                      platter
+                      flexGrow={1}
+                      onClick={async () => {
+                        if (!isXRSupported) {
+                          alert("WebXR not supported on this device.\n\nRequirements:\n• HTTPS connection (or localhost)\n• Chrome/Edge browser with WebXR enabled\n• VR/AR capable device or headset\n• Enable WebXR flags in chrome://flags");
+                          return;
+                        }
+                        try {
+                          await store.enterAR();
+                        } catch (error) {
+                          console.error("XR Error:", error);
+                          alert(`Failed to start AR session: ${error.message}\n\nTroubleshooting:\n• Ensure AR device is connected\n• Check browser permissions\n• Try refreshing the page`);
+                        }
+                      }}
+                    >
+                      <Text>{isXRSupported ? "WebXR" : "WebXR (Not Supported)"}</Text>
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <Button
