@@ -10,8 +10,8 @@ import { NOTES_COLORS } from "./hooks/useSong";
 
 export const store = createXRStore({
   controller: DrumStick,
-  meshDetection: false,
-  planeDetection: false,
+  meshDetection: true,
+  planeDetection: true,
 });
 
 function App() {
