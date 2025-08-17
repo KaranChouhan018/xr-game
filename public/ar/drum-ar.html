@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drum AR Experience</title>
+    <style>
+        body { 
+            margin: 0; 
+            background: #000; 
+            color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .ar-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .ar-button:hover {
+            background: #0056CC;
+            transform: scale(1.05);
+        }
+        .instructions {
+            max-width: 300px;
+            margin: 20px;
+            line-height: 1.5;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>🥁 Drum Kit AR</h1>
+    <div class="instructions">
+        Tap the button below to view the drum in augmented reality
+    </div>
+    
+    <!-- Direct AR Quick Look links -->
+    <a href="./drum.usdz" 
+       rel="ar" 
+       class="ar-button"
+       id="arDrum">
+        View Drum in AR
+    </a>
+    
+    <a href="./cymbal.usdz" 
+       rel="ar" 
+       class="ar-button"
+       id="arCymbal">
+        View Cymbal in AR
+    </a>
+    
+    <a href="./drumstick.usdz" 
+       rel="ar" 
+       class="ar-button"
+       id="arDrumstick">
+        View Drumstick in AR
+    </a>
+
+    <script>
+        // Force AR Quick Look behavior
+        document.getElementById('arDrum').addEventListener('click', function(e) {
+            // Ensure we're on iOS
+            if (!/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                e.preventDefault();
+                alert('AR Quick Look requires iOS Safari');
+                return;
+            }
+            
+            // Let the default behavior handle AR Quick Look
+            console.log('Launching AR Quick Look...');
+        });
+        
+        // Auto-redirect to AR if accessed directly
+        if (window.location.hash === '#ar') {
+            document.getElementById('arDrum').click();
+        }
+    </script>
+</body>
+</html>

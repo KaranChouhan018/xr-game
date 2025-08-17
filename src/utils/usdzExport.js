@@ -44,21 +44,62 @@ export class USDZExporter {
       throw new Error('AR Quick Look is only available on iOS devices');
     }
 
-    // For iOS Safari, we need to use the GLB directly with rel="ar"
+    // Use USDZ files for proper AR Quick Look support
     const baseURL = window.location.origin;
     const fullModelPath = modelPath.startsWith('/') ? modelPath : `/${modelPath}`;
     const modelURL = `${baseURL}${fullModelPath}`;
     
-    // Create invisible anchor element to trigger AR Quick Look
-    const anchor = document.createElement('a');
-    anchor.setAttribute('rel', 'ar');
-    anchor.setAttribute('href', modelURL);
-    anchor.style.display = 'none';
+    // Method 1: Direct AR Quick Look with USDZ
+    if (modelPath.includes('.usdz')) {
+      const anchor = document.createElement('a');
+      anchor.setAttribute('rel', 'ar');
+      anchor.setAttribute('href', modelURL);
+      anchor.style.display = 'none';
+      
+      document.body.appendChild(anchor);
+      anchor.click();
+      setTimeout(() => document.body.removeChild(anchor), 100);
+      return;
+    }
     
-    // Add to DOM, click, and remove
-    document.body.appendChild(anchor);
-    anchor.click();
-    setTimeout(() => document.body.removeChild(anchor), 100);
+    // Method 2: Create dynamic AR page for USDZ
+    const arPageContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AR Experience</title>
+        <style>
+          body { 
+            margin: 0; background: #000; color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; text-align: center;
+          }
+          .ar-container { max-width: 300px; }
+          .ar-button {
+            background: #007AFF; color: white; border: none;
+            padding: 20px 40px; border-radius: 25px; font-size: 18px;
+            font-weight: 600; cursor: pointer; text-decoration: none;
+            display: inline-block; margin: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="ar-container">
+          <h2>🥁 Drum Kit AR</h2>
+          <a href="${modelURL}" rel="ar" class="ar-button">View in AR</a>
+          <p>Tap the button to view the 3D model in augmented reality</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    // Open AR page in new window
+    const arWindow = window.open('', '_blank');
+    arWindow.document.write(arPageContent);
+    arWindow.document.close();
   }
 
   isIOSDevice() {
@@ -68,9 +109,9 @@ export class USDZExporter {
 
 // Available drum kit models for AR
 export const DRUM_MODELS = {
-  drum: '/models/Drum.glb',
-  cymbal: '/models/Cymbal.glb',
-  drumstick: '/models/Drum stick.glb',
+  drum: '/ar/drum.usdz',
+  cymbal: '/ar/cymbal.usdz', 
+  drumstick: '/ar/drumstick.usdz',
   note: '/models/Note.glb'
 };
 
